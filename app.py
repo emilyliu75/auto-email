@@ -9,6 +9,7 @@ load_dotenv()  # Loads .env file variables into environment
 
 app = Flask(__name__)
 
+
 def check_auth(username, password):
     # Use environment variables for credentials
     return (
@@ -37,6 +38,11 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
+
+@app.route('/private')
+@requires_auth
+def private():
+    return "You have accessed a private route!"
 
 @app.route('/')
 @requires_auth
