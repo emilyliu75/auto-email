@@ -1,0 +1,23 @@
+<!-- templates/subscribe.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Newsletter Signup</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Subscribe to our newsletter</h1>
+    <form method="post" action="/subscribe">
+      <label for="html">Name</label>
+      <input name="firstname" placeholder="Firstname" required />
+      <label for="html">Email</label>
+      <input name="email" type="email" placeholder="Email" required />
+      <label for="html">Service</label>
+      <input name="service" placeholder="Service" />
+      <button type="submit">Subscribe</button>
+    </form>
+  </body>
+</html>
