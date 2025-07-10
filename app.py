@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Response
+from functools import wraps
 import smtplib
 from email.mime.text import MIMEText
 import os
@@ -8,20 +9,46 @@ load_dotenv()  # Loads .env file variables into environment
 
 app = Flask(__name__)
 
+def check_auth(username, password):
+    # Use environment variables for credentials
+    return (
+        username == os.environ.get('BASIC_USER')
+        and password == os.environ.get('BASIC_PASS')
+    )
+
+def authenticate():
+    return Response(
+        'Could not verify your access level.\n'
+        'You have to login with proper credentials', 401,
+        {'WWW-Authenticate': 'Basic realm="Login Required"'}
+    )
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/')
+@requires_auth
 def index():
     return render_template('subscribe.html')
 
 
 @app.route('/subscribe', methods=['POST'])
+@requires_auth
 def subscribe():
     firstname = request.form['firstname']
     email = request.form['email']
+    service = request.form['service']
 
     sender = os.environ.get('EMAIL_USER')
     password = os.environ.get('EMAIL_PASS')
 
-    message = MIMEText(f"Hello {firstname},\n\nThank you for subscribing to our newsletter!")
+    message = MIMEText(f"Hello {firstname},\n\nThank you for your query regarding {service}. subscribing to our newsletter!")
     message['Subject'] = "Subscription Confirmed"
     message['From'] = sender
     message['To'] = email
