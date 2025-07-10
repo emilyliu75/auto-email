@@ -30,7 +30,9 @@ def authenticate():
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        print('requires_auth triggered on Railway')
         auth = request.authorization
+        print('Auth info:', auth)
         if not auth or not check_auth(auth.username, auth.password):
             return authenticate()
         return f(*args, **kwargs)
