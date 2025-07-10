@@ -17,11 +17,15 @@ def check_auth(username, password):
     )
 
 def authenticate():
-    return Response(
+    resp = Response(
         'Could not verify your access level.\n'
         'You have to login with proper credentials', 401,
         {'WWW-Authenticate': 'Basic realm="Login Required"'}
     )
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 def requires_auth(f):
     @wraps(f)
